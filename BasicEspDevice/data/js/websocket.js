@@ -70,7 +70,7 @@ function wsMessageType (strData) {
 	
 	if (typeof data.logger != "undefined") {
 	  for (i in data.logger) {
-	    //$("#content").append($( "<p class='logger' >"+data.logger[i]+"</p>" ));
+	    $("#content").append($( "<p class='logger col-11 col-lg-8' >"+data.logger[i]+"</p>" ));
 	  }
 	}
 	
