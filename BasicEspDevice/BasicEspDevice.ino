@@ -1,22 +1,14 @@
 //Own Libs
-//#pragma once
-	#include "WiFiController.h"
-//#pragma once
-	#include "NTPController.h"
 
-	#include "WebServer.h"
+#include "WiFiController.h"
+#include "NTPController.h"
+#include "WebServer.h"
+
 
 #include <WiFiClientSecureBearSSL.h>
 
 AsyncWebServer webServer(80);
 AsyncWebSocket ws("/");
-
-
-
-
-#ifndef webSocket
-	
-#endif
 
 LogBuffer		logger;
 WiFiController	WiFiCtrl	(logger);
@@ -48,15 +40,12 @@ void setup() {
 		//NTP.setTimeZone("TZ_Europe_Moscow");		
 	}
 
-	#ifdef webSocket
-		webServer.addHandler(&logger.ws);
-	#endif
+
+
+	webServer.addHandler(&logger.ws);
 	ws.onEvent(wsOnEvent);
 	webServer.addHandler(&ws);
-	webServerBegin(/*webServer*/);
-
-	//webServer.addHandler(&wsLogger);
-	//webServer.begin();
+	webServerBegin();
 
 
 	//logger.test_addSomeRows();
@@ -66,7 +55,7 @@ void setup() {
 	prev_millis = millis();
 	//test();
 	//logger.test_addSomeRows();
-	logger.printLogBufferToSerial();
+	//logger.printLogBufferToSerial();
 }
 
 void loop() { 
@@ -78,7 +67,7 @@ void loop() {
 		Serial.println();
 		Serial.println(NTP.getUptimeString());
 		Serial.println(NTP.getTimeDateString());
-		logger.logRow(String(millis()));
+		//logger.logRow(String(millis()));
 		wsStatus();
 		//Serial.println(logger.getTimeStrFromSec());
 	}

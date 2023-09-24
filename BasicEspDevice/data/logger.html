@@ -22,77 +22,7 @@
 	<link rel="prefetch " href="img/loader.gif">
 	<link rel="icon" type="image/x-icon" href="/img/favicon.ico">
     <script>
-        /*var wsLogger = new WebSocket('ws://'+location.hostname+'/logger');
-        var webSocketPause = 0;
-        var webSocketOpened = false;
-        const webSocketPauseLimit = 4;
-        var webSocketTimer = setInterval (increasePause, 1000);        
-
-        function increasePause () {
-        	if (webSocketOpened) {
-        		webSocketPause++;
-        		if (webSocketPause > webSocketPauseLimit) {
-        			wsLogger.close();
-        			if (confirm("Соединение потеряно. Нет данных с устройства более " + String(Number(1)+ Number(webSocketPauseLimit)) +" секунд. \nСтраница перестала синхронизироваться с устройством и устарела. \nОбновить страницу, когда устройство снова будет доступно?")) {
-        				let min_window_size = Math.min($(window).height(), $(window).width());
-        				$.blockUI({ message: '<img src="img/loader.gif" class="block-gif"/>' ,
-        										css: { 
-        												top:  ($(window).height() - min_window_size*0.4) /2 + 'px', 
-        												left: ($(window).width() - min_window_size*0.4) /2 + 'px', 
-        												width: min_window_size*0.4+'px',
-        												height: min_window_size*0.4+'px',
-        												backgroundColor: 'transparent',
-        												border: '0px',
-        												opacity: 0.8
-        										} 	
-        				});	
-        				let pingTimer = setInterval (pingHost, 2000);
-        			}			
-        		};
-        	}
-        }
-        
-        function pingHost () {
-        	$.ajax({
-        			type: 'GET',
-        			url: '/ping',
-        			headers: {'Content-Type': 'text/plain'},
-        			success: function(data) {
-        				//$.unblockUI();
-        				window.location.reload();
-        			}
-        		});	
-        }        
-        
-        wsLogger.onopen = function(e) {
-          	webSocketOpened = true;
-          	webSocketPause = 0;
-            $("#header").text("Online");
-            $("#header").css("background-color", "rgb(80, 95, 80)");	
-          	console.log("WebSocket opened");
-        };        
-        
-        wsLogger.onmessage = function (event) {
-            webSocketPause = 0;
-            wsMessageType(event.data);
-        };
-        
-        wsLogger.onclose = function (event) {
-          webSocketOpened = false;
-          $("#header").text("Offline");
-          $("#header").css("background-color", "rgb(105, 80, 80)");
-          console.log("WebSocket closed");  
-        };        
-        
-        wsLogger.onerror = function(error) {
-            alert("Ошибка соединения: " + error.message);
-        };
-        
-        function wsMessageType (strData) {
-	        let data = JSON.parse(strData);        
-          if (typeof data.ping != "undefined") return;
-          console.log(data);	        
-        }*/
+     
     </script>
 	
 </head>
@@ -101,9 +31,8 @@
       Offline
     </div>  
     <div id="content">
-        <textarea disabled id="logger"  cols="100" style="resize: vertical; min-width: 50rem;"></textarea>
-        <p class="logger" >00:00:04 Fast connect: Connected to 'AnJ'</p>
-        <p class="logger" >00:00:05 Fast connect: Connected to 'AnJ'</p>
+        <!--<p class="logger col-sm-12 col-lg-8">00:00:03 Fast connect: Connected to 'AnJ'</p>
+        <p class="logger col-sm-12 col-lg-8">00:00:04 Fast connect: Connected to 'AnJ'</p>-->
     </div>
 </body>
 </html>    
