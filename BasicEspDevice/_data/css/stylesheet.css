@@ -1,0 +1,358 @@
+[class*="col-"] {
+	padding: 0px;
+}
+
+#content {
+	display: flex;
+	flex-wrap: wrap-reverse;
+}
+
+.row {
+	margin: 0.3rem 1rem;
+}
+
+.row_input_part {
+	margin: 0.3rem auto;
+}
+
+.row_input_data {
+	padding: 0 0.5rem;
+	margin: 0.3rem auto;
+}
+
+.full_width {
+	width: 100%;
+}
+
+span {
+	display: flex;
+}
+
+body {
+	background-color: rgb(30,30,30);
+	font-family: -apple-system,
+		BlinkMacSystemFont,
+		"Segoe UI",
+		Roboto,
+		"Helvetica Neue",
+		Arial,
+		"Noto Sans",
+		sans-serif,
+		"Apple Color Emoji",
+		"Segoe UI Emoji",
+		"Segoe UI Symbol",
+		"Noto Color Emoji";
+}
+
+h1, h2, h3, h4, h5, h6, p.title, p.alarm-global-desc {
+	color: rgb(225, 225, 225);
+	font-family: inherit;
+	font-weight: 500;
+	line-height: 1.5;
+}
+
+h1, h2, h3, h4, h5, h6, p.title {
+	text-align: center;
+	margin-top: 0;
+	margin-bottom: 0.5rem;
+}
+
+h1 {
+	font-size: 2.5rem;		
+}
+
+h3 {
+	margin: -2px;
+	padding: 5px;
+	font-size: 1.75rem;
+}
+
+h6 {
+	-ms-flex: 0 0 auto;
+	flex: 0 0 auto;	
+	width: 100%;
+	font-size: 1.25rem;
+	padding: 5px;
+	white-space: nowrap;
+}
+
+.long_title {
+	white-space: normal !important;
+}
+
+p.title {
+	font-size: 1.25rem;
+	margin-left: auto;
+	white-space: nowrap;
+	text-align: center;
+}
+
+form {
+	padding: 0 !important;
+	margin: 0px 5px !important;
+	width: calc(100% - 15px) !important;
+	background-color: rgb(80,80,80);
+	border: 2px solid rgb(100,100,100);
+	border-radius: 10px;
+	box-shadow:
+		1px 0px rgb(98,98,98), 1px 1px rgb(90,90,90),
+		2px 1px rgb(94,94,94), 2px 2px rgb(80,80,80),
+		3px 2px rgb(90,90,90), 3px 3px rgb(70,70,70),
+		4px 3px rgb(86,86,86), 4px 4px rgb(60,60,60),
+		5px 4px rgb(82,82,82), 5px 5px rgb(50,50,50);
+}
+
+li {
+	list-style-type: none;
+}
+ul {
+	margin: 0;
+	padding: 0;
+}
+
+.menu_item {
+	margin: 5px;
+}
+
+.gray-border {
+	border: 2px solid rgb(225, 225, 225);
+	border-radius: 10px;	
+}
+
+.border-padding {
+	padding: 0.2rem;
+}
+
+img {
+	width: 1rem;
+	height: 1rem;
+}
+
+.hint_img {
+	vertical-align: top;
+	margin-top: 0.1rem;
+	margin-left: 0.5rem;
+}
+
+input, select{
+	padding: 5px;
+	margin: 0 0.2em;
+	font-size: 1rem;
+	outline: none;
+	color: rgb(225, 225, 225);
+	
+	font-family: inherit;
+	font-weight: 500;	
+}
+
+.short_input {
+	width: 4rem !important;
+	text-align: center !important;
+	
+}
+
+#DeviceName {
+	width: 50%;
+	text-align: center;
+}
+
+input[type="text"], 
+input[type="number"],
+input[type="password"], 
+input[type="time"],
+select, p.like_input
+{
+	text-align: left;
+	background-color: rgb(55,55,55);
+	border: 2px solid rgb(60, 60, 60);
+	border-radius: 15px;
+	box-shadow:
+		1px 0px rgb(70,70,70), 1px 1px rgb(62,72,72),
+		2px 1px rgb(75,75,75), 2px 2px rgb(66,76,76),
+		3px 2px rgb(80,80,80), 3px 3px rgb(72,72,72);	
+}
+
+input[type="color"] {
+	padding: 0;
+  min-height: 2rem;
+}
+
+@media (max-width: 992px) {
+	#DeviceName {width: 100%;}
+	#NTPtimezone, #WiFiTries, .sm-center {margin: auto !important;}	
+	input[type="text"], 
+	input[type="password"], 
+	input[type="time"],
+	select	{
+		text-align: center;		
+	}
+
+	.gradient {
+		margin: auto !important;
+	}
+	.alarm_global_params {
+			margin: auto 0 auto auto !important;
+	}
+	.alarm_demo_button {
+		width: 75%;
+		margin: auto;
+	}	
+}
+
+input[type="text"], input[type="password"] {
+	width: 100%;
+}
+
+input[type="checkbox"], .show_password, .text {
+	/*height: 100%;*/
+	margin: auto 0.2rem;
+}
+
+label {
+	margin: auto 0;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	color: rgb(225, 225, 225);
+}
+
+p {
+	white-space: normal;
+}
+
+p.text {
+	color: rgb(225, 225, 225);
+}
+
+@media (min-width: 375px) {
+	p.show_password, p.title, p.text {
+		white-space: nowrap;
+	}
+}
+
+input[type="button"] {
+	line-height: 1.2;
+	font-size: 1.75rem;
+	border: 2px solid;
+	border-radius: 10px;
+	border-color: rgb(225, 225, 225);
+	background: linear-gradient(45deg, rgb(125, 120, 85), rgb(55, 100, 80));
+}
+
+input[type="button"][disabled] {
+	background: rgb(150, 150, 150);
+}
+
+.alarm_row {
+	padding: 5px 10px;
+	background-color: rgb(100, 100, 100);
+}
+
+.alarm_global_params {
+	margin: auto;
+}
+
+.alarm-global-desc {
+	margin: 0.2rem auto;
+  text-align: justify;
+}
+
+.gradient {
+	background: linear-gradient(90deg, rgb(170, 85, 0), rgb(255, 240, 210));
+  width: 100%;
+  min-height: 2rem;
+}
+
+.alarm_title, .alarm_time , .alarm_weekdays , .alarm_buttons{
+	margin: 5px auto;
+}
+
+.row_alarm_input, .ntp_servers_input  {
+	flex-wrap: wrap;
+}
+
+.alarm_time, .alarm_weekdays, .alarm_buttons,
+.alarm_workdays, .alarm_weekend {
+	justify-content: center;
+}
+
+.alarm_workdays, .alarm_weekend {
+	padding: 0 0.4em !important;
+	margin: 0 0.2em;
+}
+
+.alarm_weekend {
+	border: 2px solid rgb(150,50,50);
+	border-radius: 15px;
+}
+
+.alarm_weekdays_border {
+	background-color: rgb(55,55,55);
+	border: 2px solid rgb(60, 60, 60);
+	border-radius: 15px;
+	box-shadow:
+		1px 0px rgb(70,70,70), 1px 1px rgb(62,72,72),
+		2px 1px rgb(75,75,75), 2px 2px rgb(66,76,76),
+		3px 2px rgb(80,80,80), 3px 3px rgb(72,72,72);
+
+	justify-content: center;
+	flex-wrap: wrap;
+
+}
+
+.alarm_weekdays > label {
+	margin: 0 auto;	
+}
+
+.alarm_del_button {
+	border: 2px solid;
+	border-radius: 10px;
+	border-color: rgb(225, 225, 225);
+	background-color: rgb(150, 150, 150);
+	height: 1.7rem; 
+	line-height: 1.7rem;
+	width: 3rem;
+	margin-left: 4px;
+	outline: none;
+}
+
+.add_alarm_button {
+	margin: 0.3rem auto;
+}
+
+.save_button {
+	margin: -2px;
+	width: calc(100% + 4px);
+	white-space: normal;
+}
+
+p.row_title, p.like_input {
+	padding: 5px;
+  margin: 0 0.2em;
+	width: 100%;
+	font-size: 1rem;
+	font-family: inherit;
+	color: white;
+	text-align: center;
+}
+
+p.row_title {	
+	font-weight: 500;
+}
+.blockUI img {
+	 height: 100%;
+	 width: 100%;	
+}
+input:invalid {
+	border-color: rgb(220,100,100);
+
+
+	box-shadow:
+		2px 1px rgb(210,94,94), 2px 2px rgb(185,75,75),
+		1px 0px rgb(215,98,98), 1px 1px rgb(195,90,90),
+		3px 2px rgb(205,90,90), 3px 3px rgb(175,60,60);
+}
+
+.alarm_demo_button {
+	font-size: 1.25rem !important;
+}

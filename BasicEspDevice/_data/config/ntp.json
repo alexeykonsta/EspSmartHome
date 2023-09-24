@@ -1,0 +1,9 @@
+{
+	"ntp": {
+		"server": ["ru.pool.ntp.org", "europe.pool.ntp.org", "pool.ntp.org"],
+		"timezone": 10800,
+		"tries": 10,
+		"time_update": 12,
+		"udp_resend": 1
+	}
+}

@@ -1,0 +1,28 @@
+{
+	"alarms": [
+		{
+			"type": "ones",
+			"hour": 11,
+			"minute": 0,
+			"active": 0
+		},			
+		{
+			"type": "ones",
+			"hour": 11,
+			"minute": 15,
+			"active": 0
+		},		
+		{
+			"type": "ones",
+			"hour": 11,
+			"minute": 30,
+			"active": 0
+		},			
+		{
+			"type": "ones",
+			"hour": 11,
+			"minute": 45,
+			"active": 0
+		}
+	]
+}

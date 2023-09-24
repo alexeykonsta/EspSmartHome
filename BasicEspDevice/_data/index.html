@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>ESP Home</title>
+	
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<link rel="stylesheet" href="css/bootstrap-grid.css"> 
+	<link rel="stylesheet" href="css/stylesheet.css"> 
+	<link rel="stylesheet" href="css/onoffswitcher.css">
+	
+	<script src="js/jquery-1.11.0.min.js"></script>	
+	<script src="js/jquery.blockUI.js"></script>
+	
+	<script src="js/UIactions.js"></script>
+	<script src="js/UIfill.js"></script>
+	<script src="js/UIget.js"></script>
+	
+	<script src="js/websocket.js"></script>
+	
+	<link rel="prefetch " href="img/loader.gif">
+	
+</head>
+<body>
+		
+	<div id="content">
+		<div class="menu col-lg-8 col-sm-12">
+			<h1>Настройки модуля:</h1>
+			<form id="settings" onsubmit="event.preventDefault();">
+				<ul>
+					<li class="menu_item gray-border">
+						<h3 class="gray-border">Имя устройства</h3>
+						<div class="row">
+							<span class="row_input col-lg-12 col-sm-12">
+								<input id="DeviceName" class="row_input_part" type="text">
+							</span>
+						</div>	
+					</li>			
+
+					<li class="menu_item gray-border">
+						<h3 class="menu_item_title gray-border">Wi-Fi сеть</h3>
+						<div class="menu_item_body">
+						
+							<div class="row">
+								<span class="row_title col-lg-4 col-sm-12">
+									<h6>Имя Wi-Fi сети:<img class="hint_img" src="img/hint.png"></h6>
+								</span>
+								<span class="row_input col-lg-8 col-sm-12">
+									<span class="row_input_part full_width"><input id="WiFiName" type="text"></span>
+								</span>
+							</div>
+							
+							<div class="row">
+								<span class="row_title col-lg-4 col-sm-12">
+									<h6>Пароль Wi-Fi сети:<img class="hint_img" src="img/hint.png"></h6>
+								</span>						
+								<span class="row_input col-lg-8 col-sm-12">
+									<span class="row_input_part full_width"><input id="WiFiPassword" type="password"></span>
+									<span class="row_input_part">
+										<label>
+											<input type="checkbox" class="showPassword">
+											<p class="show_password">Показать пароль</p>
+										</label>
+									</span>
+								</span>						
+							</div>					
+
+							<div class="row">
+								<span class="row_title col-lg-4 col-sm-12">
+									<h6 class="long_title">Время на подключения:<img class="hint_img" src="img/hint.png"></h6>
+								</span>							
+								<span class="row_input row_input_part col-lg-8 col-sm-12">
+									<span class="sm-center">
+										<input id="WiFiTries" type="number" min="7" step="1" max="60" class="short_input">
+										<p class="text">сек</p>
+									</span>
+								</span>
+							</div>
+							
+						</div>
+					</li>
+				
+					<li class="menu_item gray-border">
+						<h3 class="menu_item_title gray-border">Точка доступа Wi-Fi</h3>
+						<div class="menu_item_body">
+						
+							<div class="row">
+								<span class="row_title col-lg-4 col-sm-12">
+									<h6>Имя точки доступа:<img class="hint_img" src="img/hint.png"></h6>
+								</span>
+								<span class="row_input col-lg-8 col-sm-12">
+									<span class="row_input_part full_width"><input id="APName" type="text"></span>
+								</span>
+							</div>
+							
+							<div class="row">
+								<span class="row_title col-lg-4 col-sm-12">
+									<h6>Пароль точки доступа:<img class="hint_img" src="img/hint.png"></h6>
+								</span>						
+								<span class="row_input col-lg-8 col-sm-12">
+									<span class="row_input_part full_width"><input id="APPassword" type="password"></span>
+										<span class="row_input_part">
+											<label>
+												<input type="checkbox" class="showPassword">
+												<p class="show_password">Показать пароль</p>
+											</label>
+										</span>
+									</span>					
+							</div>
+						</div>
+					</li>
+					
+					<li class="menu_item gray-border">
+						<h3 class="menu_item_title gray-border">FTP</h3>
+						<div class="menu_item_body">
+
+							<div class="row">
+								<span class="row_title col-lg-4 col-sm-12">
+									<h6>Запуск:<img class="hint_img" src="img/hint.png"></h6>
+								</span>
+								<span class="row_input col-lg-8 col-sm-12">
+									<span class="sm-center onoffswitch row_input_part">
+										<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="FTPonoffswitch">
+										<label class="onoffswitch-label" for="FTPonoffswitch">
+											<span class="onoffswitch-inner"></span>
+										</label>
+									</span>					
+								</span>
+							</div>
+
+							<div class="row">
+								<span class="row_title col-lg-4 col-sm-12">
+									<h6>Логин:<img class="hint_img" src="img/hint.png"></h6>
+								</span>
+								<span class="row_input col-lg-8 col-sm-12">
+									<span class="row_input_part full_width"><input id="FTPName" type="text"></span>
+								</span>
+							</div>
+							
+							<div class="row">
+								<span class="row_title col-lg-4 col-sm-12">
+									<h6>Пароль:<img class="hint_img" src="img/hint.png"></h6>
+								</span>						
+								<span class="row_input col-lg-8 col-sm-12">
+									<span class="row_input_part full_width"><input id="FTPPassword" type="password"></span>
+										<span class="row_input_part">
+											<label>
+												<input type="checkbox" class="showPassword">
+												<p class="show_password">Показать пароль</p>
+											</label>
+										</span>
+									</span>			
+							</div>
+							
+						</div>
+					</li>				
+					
+					<li class="menu_item gray-border">
+						<h3 class="menu_item_title gray-border">Время и часовой пояс</h3>
+						<div class="menu_item_body">
+						
+							<div class="row">
+								<span class="row_title col-lg-4 col-sm-12">
+									<h6>NTP:<img class="hint_img" src="img/hint.png"></h6>
+								</span>
+								<span class="row_input ntp_servers_input col-lg-8 col-sm-12">
+								
+									<span class="row_input_part col-lg-4 col-sm-12"><input id="NTP_server_1" type="text"></span>
+									<span class="row_input_part col-lg-4 col-sm-12"><input id="NTP_server_2" type="text"></span>
+									<span class="row_input_part col-lg-4 col-sm-12"><input id="NTP_server_3" type="text"></span>							
+								</span>
+							</div>					
+							<div class="row">
+								<span class="row_title col-lg-4 col-sm-12">
+									<h6>Часовой пояс:<img class="hint_img" src="img/hint.png"></h6>
+								</span>
+								<span class="row_input row_input_part col-lg-8 col-sm-12">
+									<select id="NTPtimezone" class="short_input">
+										<option value="-11">-11</option>
+										<option value="-10">-10</option>
+										<option value="-8">-8</option>
+										<option value="-7">-7</option>
+										<option value="-6">-6</option>
+										<option value="-5">-5</option>
+										<option value="-4">-4</option>
+										<option value="-3">-3</option>
+										<option value="-2">-2</option>
+										<option value="-1">-1</option>
+										<option value="0">-0</option>
+										<option value="1">+1</option>
+										<option value="2">+2</option>
+										<option value="3">+3</option>
+										<option value="4">+4</option>
+										<option value="5">+5</option>
+										<option value="6">+6</option>
+										<option value="7">+7</option>
+										<option value="8">+8</option>
+										<option value="9">+9</option>
+										<option value="10">+10</option>
+										<option value="11">+11</option>
+										<option value="12">+12</option>
+										<option value="13">+13</option>
+									</select>
+								</span>
+							</div>
+							
+							<div class="row">
+								<span class="row_title col-lg-4 col-sm-12">
+									<h6 class="long_title">Время на подключения:<img class="hint_img" src="img/hint.png"></h6>
+								</span>							
+								<span class="row_input row_input_part col-lg-8 col-sm-12">
+									<span class="sm-center">
+										<input id="NTPTries" type="number" min="7" step="1" max="60" class="short_input">
+										<p class="text">сек</p>
+									</span>
+								</span>
+							</div>
+
+							<div class="row">
+								<span class="row_title col-lg-4 col-sm-12">
+									<h6 class="long_title">Период синхронизации:<img class="hint_img" src="img/hint.png"></h6>
+								</span>							
+								<span class="row_input row_input_part col-lg-8 col-sm-12">
+									<span class="sm-center">
+										<input id="NTPTimeUpdate" type="number" min="2" step="1" max="96" class="short_input">
+										<p class="text">часов</p>
+									</span>
+								</span>
+							</div>
+
+							<div class="row">
+								<span class="row_title col-lg-4 col-sm-12">
+									<h6 class="long_title">Повтор попытки синхронизации:<img class="hint_img" src="img/hint.png"></h6>
+								</span>							
+								<span class="row_input row_input_part col-lg-8 col-sm-12">
+									<span class="sm-center">
+										<input id="NTPUdpResend" type="number" min="1" step="1" max="60" class="short_input">
+										<p class="text">мин</p>
+									</span>
+								</span>
+							</div>
+							
+						</div>
+					</li>
+					
+					<li class="menu_item gray-border">
+						<h3 class="menu_item_title gray-border">Будильники (0/5) <img class="hint_img" src="img/hint.png"></h3>
+						<div class="menu_item_body">
+							<div class="row row_input gray-border border-padding">
+								<p class="alarm-global-desc"> Рассвет начинается за 
+										<input type="number" min="5" step="1" max="120" id="sunRiseDuration" class="short_input">
+										 мин. до времени будильника. После чего лампа светит ещё 
+										<input type="number" min="1" step="1" max="60" id="solsticeDuration" class="short_input">
+										 мин. и выключается. 
+								</p>
+							</div>
+							<div class="row row_input">
+									<span class="row_input_part col-lg-4 col-sm-12">
+										<span class="col-8">
+											<p class="title">Цвет начала:<img class="hint_img" src="img/hint.png"></p>
+										</span>
+										<span class="col-4">
+											<input class="alarm_global_params" type="color" id="sunRiseStartColor" value="#aa5500">									
+										</span>
+									</span>
+									<span class="row_input_part col-lg-4 col-sm-12">
+										<span class="col-8">
+											<p class="title">Цвет окончания:<img class="hint_img" src="img/hint.png"></p>
+										</span>
+										<span class="col-4">
+											<input class="alarm_global_params" type="color" id="sunRiseEndColor" value="#fff0d2">
+										</span>
+									</span>
+									<span class="row_input_part col-lg-4 col-sm-12">
+										<span class="col-12">
+											<p class="gradient alarm_global_params"></p>
+										</span>
+									</span>			
+							</div>				
+							
+							<div class="row row_input">
+									<span class="row_input_part col-lg-4 col-sm-12">
+										<span class="col-8">
+											<p class="title">Яркость начала:<img class="hint_img" src="img/hint.png"></p>
+										</span>
+										<span class="col-4">
+											<input type="number" min="1" step="1" max="100" id="sunRiseStartBrightness" class="short_input alarm_global_params"> 
+										</span>
+									</span>
+									<span class="row_input_part col-lg-4 col-sm-12">
+										<span class="col-8">
+											<p class="title">Яркость окончания:<img class="hint_img" src="img/hint.png"></p>
+										</span>
+										<span class="col-4">
+											<input type="number" min="5" step="1" max="100" id="sunRiseEndBrightness" class="short_input alarm_global_params">
+										</span>								
+									</span>
+									<span class="row_input_part col-lg-4 col-sm-12">
+										<span class="col-12">
+											<input type="button" value="Демо">
+										</span>									
+									</span>			
+							</div>						
+						<!--	
+							<div class="row alarm_row gray-border">
+									<span class="row_title col-lg-4 col-sm-12">
+										<span class="alarm_title">
+											<select onchange="hide_show_weekdays(this)">
+												<option value="ones">Один раз</option>
+												<option value="weekly">Каждую неделю</option>
+											</select>												
+										</span>
+									</span>
+									
+									<span class="row_input row_alarm_input  col-lg-8 col-sm-12">
+										<span class="alarm_time col-lg-2 col-sm12">
+											<input type="time" pattern="[0-9]{2}:[0-9]{2}" value="06:00">
+										</span>
+										
+										<span class="alarm_weekdays col-lg-7 col-sm12">
+											<span class="alarm_weekdays_border">
+												<span class="alarm_workdays">
+													<input type="checkbox" id="1">
+													<label>Пн</label>
+													<input type="checkbox" id="2">
+													<label>Вт</label>
+													<input type="checkbox" id="3">
+													<label>Ср</label>
+													<input type="checkbox" id="4">
+													<label>Чт</label>
+													<input type="checkbox" id="5">
+													<label>Пт</label>
+												</span>
+												<span class="alarm_weekend">
+													<input type="checkbox" id="6">
+													<label>Сб</label>
+													<input type="checkbox" id="7">
+													<label>Вс</label>
+												</span>
+											</span>
+										</span>
+										
+										<span class="alarm_buttons col-lg-3 col-sm12">
+											<span class="onoffswitch">
+												<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch1111">
+												<label class="onoffswitch-label" for="myonoffswitch11111">
+													<span class="onoffswitch-inner"></span>
+												</label>
+											</span>
+											
+											<span class="onoffswitch">
+												<button type="button" class="alarm_del_button" onclick="delete_alarm(this)">
+													<img class="cross_img" src="img/cross.png">										
+												</button>
+											</span>
+										</span>
+							</div>-->					
+							
+							<div class="row">
+								<input class="add_alarm_button" type="button" value="Добавить">
+							</div>
+							
+						</div>
+					</li>
+					
+					<li class="menu_item gray-border">			
+						<input class="save_button" type="button" value="Сохранить изменения" disabled>
+					</li>
+				</ul>
+			</form>
+		</div>
+		
+		<div class="col-lg-4 col-sm-12">
+			<h1>Показания модуля:</h1>
+			<form id="lamp_control" onsubmit="event.preventDefault();">
+			
+				<div class="row row_input_part ">
+					<span class="row_title row_input_data col-lg-4 col-sm-12">
+						<p class="row_title">Лампа</p>
+					</span>
+					<span class="row_input row_input_data col-lg-8 col-sm-12">
+						<span class="sm-center onoffswitch">
+							<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="LAMPonoffswitch" onChange="sendLampStatus()">
+							<label class="onoffswitch-label" for="LAMPonoffswitch">
+								<span class="onoffswitch-inner"></span>
+							</label>
+						</span>
+					</span>
+				</div>			
+
+				<div class="row row_input_part ">
+					<span class="row_title row_input_data col-lg-4 col-sm-12">
+						<p class="row_title">Режим</p>
+					</span>
+					<span class="row_input row_input_data col-lg-8 col-sm-12">
+						<select class="sm-center" id="lampMode" onChange="hide_show_lamp_color(); sendLampStatus();">
+							<option value="0">Белый</option>
+							<option value="1">Цвет</option>
+							<option value="999">Потом добавим ещё</option>
+						</select>						
+					</span>
+				</div>
+
+				<div class="row row_input_part">
+					<span class="row_title row_input_data col-lg-4 col-sm-12">
+						<p class="row_title">Цвет</p>
+					</span>
+					<span class="row_input row_input_data col-lg-8 col-sm-12">
+						<input class= "sm-center" type="color" name="LAMPcolor" id="lampColor" value="#646464" onChange="sendLampStatus()">
+					</span>
+				</div>	
+
+				<div class="row row_input_part">
+					<span class="row_title row_input_data col-lg-4 col-sm-12">
+						<p class="row_title">Яркость</p>
+					</span>
+					<span class="row_input row_input_data col-lg-8 col-sm-12">
+						<span class="sm-center">
+							<input type="number" min="5" step="1" max="100" id="lampBrightnessNum" class="short_input">
+							<input type="range" min="5" max="100" step="1" value="50" id="lampBrightness">
+						</span>
+					</span>
+				</div>	
+			
+				<div class="row row_input_part ">
+					<span class="row_title row_input_data col-lg-4 col-sm-12">
+						<p class="row_title">Дата</p>
+					</span>
+					<span class="row_input row_input_data col-lg-8 col-sm-12">
+						<p class="like_input" id="date">01.01.1970</p>
+					</span>
+				</div>
+				<div class="row row_input_part ">
+					<span class="row_title row_input_data col-lg-4 col-sm-12">
+						<p class="row_title">Время</p>
+					</span>
+					<span class="row_input row_input_data col-lg-8 col-sm-12">
+						<p class="like_input" id="time">00:00:00</p>
+					</span>
+				</div>		
+			</form>
+		</div>
+	</div>
+	
+	<div id="footer">
+	</div>
+</body>
+</html>

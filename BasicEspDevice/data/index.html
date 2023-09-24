@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>ESP Home</title>
+	
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<link rel="stylesheet" href="css/bootstrap-grid.css"> 
+	<link rel="stylesheet" href="css/stylesheet.css"> 
+	<link rel="stylesheet" href="css/onoffswitcher.css">
+	
+	<script src="js/jquery-1.11.0.min.js"></script>	
+	<script src="js/jquery.blockUI.js"></script>
+	
+	<script src="js/UIactions.js"></script>
+	<script src="js/UIfill.js"></script>
+	<script src="js/UIget.js"></script>
+	
+	<script src="js/websocket.js"></script>
+	
+	<link rel="prefetch " href="img/loader.gif">
+	<link rel="icon" type="image/x-icon" href="/img/favicon.ico">
+	
+</head>
+<body>
+  <div id="header">
+    Offline
+  </div>		
+	<div id="content">
+	  <!--Настройки модуля-->
+		<div class="menu col-lg-8 col-sm-12">
+			<h1>Настройки модуля:</h1>
+			<form id="settings" onsubmit="event.preventDefault();">
+				<ul>
+				  
+				  <!--Имя устройства-->		
+					<li class="menu_item gray-border">
+						<h3 class="gray-border">Имя устройства</h3>
+						<div class="row">
+							<span class=" col-lg-12 col-sm-12">
+								<input id="DeviceName" class="row_input_part" type="text">
+							</span>
+						</div>	
+					</li>			
+
+          <!--Wi-Fi сеть-->			
+					<li class="menu_item gray-border">
+						<h3 class="menu_item_title gray-border">Wi-Fi сеть</h3>
+						<div class="menu_item_body">
+						
+							<div class="row">
+								<span class="row_title col-lg-4 col-sm-12">
+									<h6>Имя Wi-Fi сети:<img class="hint_img" src="img/hint.png"></h6>
+								</span>
+								<span class=" col-lg-8 col-sm-12">
+									<span class="row_input_part full_width"><input id="WiFiName" type="text"></span>
+								</span>
+							</div>
+							
+							<div class="row">
+								<span class="row_title col-lg-4 col-sm-12">
+									<h6>Пароль Wi-Fi сети:<img class="hint_img" src="img/hint.png"></h6>
+								</span>						
+								<span class=" col-lg-8 col-sm-12">
+									<span class="row_input_part full_width"><input id="WiFiPassword" type="password"></span>
+									<span class="row_input_part">
+										<label>
+											<input type="checkbox" class="showPassword">
+											<p class="show_password">Показать пароль</p>
+										</label>
+									</span>
+								</span>						
+							</div>					
+
+							<div class="row">
+								<span class="row_title col-lg-4 col-sm-12">
+									<h6 class="long_title">Попыток подключения:<img class="hint_img" src="img/hint.png"></h6>
+								</span>							
+								<span class=" row_input_part col-lg-8 col-sm-12">
+									<span class="sm-center">
+										<input id="WiFiTries" type="number" min="2" step="10" max="60" required class="short_input">
+										<p class="text">сек</p>
+									</span>
+								</span>
+							</div>
+							
+						</div>
+					</li>
+	
+	        <!--Точка доступа Wi-Fi-->			
+					<li class="menu_item gray-border">
+						<h3 class="menu_item_title gray-border">Точка доступа Wi-Fi</h3>
+						<div class="menu_item_body">
+						
+							<div class="row">
+								<span class="row_title col-lg-4 col-sm-12">
+									<h6>Имя точки доступа:<img class="hint_img" src="img/hint.png"></h6>
+								</span>
+								<span class=" col-lg-8 col-sm-12">
+									<span class="row_input_part full_width"><input id="APName" type="text" required></span>
+								</span>
+							</div>
+							
+							<div class="row">
+								<span class="row_title col-lg-4 col-sm-12">
+									<h6>Пароль точки доступа:<img class="hint_img" src="img/hint.png"></h6>
+								</span>						
+								<span class=" col-lg-8 col-sm-12">
+									<span class="row_input_part full_width"><input id="APPassword" type="password"></span>
+										<span class="row_input_part">
+											<label>
+												<input type="checkbox" class="showPassword">
+												<p class="show_password">Показать пароль</p>
+											</label>
+										</span>
+									</span>					
+							</div>
+						</div>
+					</li>
+					
+					<!--NTP-->
+					<li class="menu_item gray-border">
+						<h3 class="menu_item_title gray-border">NTP</h3>
+						<div class="menu_item_body">
+
+              <div class="row">
+								<span class="row_title col-lg-4 col-sm-12">
+									<h6>Источник часового пояса:<img class="hint_img" src="img/hint.png"></h6>
+								</span>						
+								<span class=" col-lg-8 col-sm-12">
+								  <span class="row_input_part">
+                    <label>
+                      <input type="radio" id="ntpoffset_web" name="ntpoffset" value="web"/>
+                      <p class="text">Web</p>
+                    </label>
+								  </span>
+								  <span class="row_input_part">
+                    <label>
+                      <input type="radio" id="ntpoffset_config" name="ntpoffset" value="config"/>
+                      <p class="text">Config</p>
+                    </label>
+								  </span>
+								</span>					
+							</div>
+							
+              <div class="row">
+								<span class="row_title col-lg-4 col-sm-12">
+									<h6>Часовой пояс:<img class="hint_img" src="img/hint.png"></h6>
+								</span>
+								<span class=" col-lg-8 col-sm-12">
+								  <span>
+								    <input id="ntpoffset" type="text" min="-86400" max="86400"/>
+								    <p class="text">сек</p>
+								  </span>
+								</span>
+							</div>							
+						  
+						</div>
+					</li>						  				
+
+          <!--Обновление-->
+					<li class="menu_item gray-border">
+						<h3 class="menu_item_title gray-border">Обновление</h3>
+						<div class="menu_item_body">
+						  
+							<div class="row">
+								<span class="row_title col-lg-4 col-sm-12">
+									<h6 class="long_title">Ручное обнавление:<img class="hint_img" src="img/hint.png"></h6>
+								</span>
+								<span class="row_input_parts col-lg-8 col-sm-12">
+									<span class="row_input_part col-lg-8 col-sm-12">
+										<input class="sm-center" id="ManualUpdate" name="update" type="file" accept=".bin">
+									</span>
+									<span class="row_input_part col-lg-4 col-sm-12">
+										<input class="sm-center" id="update_by_file_button" type="button" value="Обновить" disabled>
+									</span>
+								</span>
+							</div>
+							
+						</div>
+					</li>
+					
+					<!--Другое-->
+					<li class="menu_item gray-border">
+						<h3 class="menu_item_title gray-border">Другое</h3>
+						<div class="menu_item_body">
+							<div class="row">
+								<span class="row_title col-lg-12 col-sm-12">
+									<input class="sm-center other" type="button" value="Менеджер файлов" onclick="window.open('/fseditor', '_blank')">
+								</span>
+							</div>
+							<div class="row">
+								<span class="row_title col-lg-12 col-sm-12">
+									<input class="sm-center other" type="button" value="Логгер" onclick="window.open('/logger', '_blank')">
+								</span>
+							</div>							
+							<div class="row">
+								<span class="row_title col-lg-12 col-sm-12">
+									<input class="sm-center other" id="reload_button" type="button" value="Перезагрузить">
+								</span>
+							</div>							
+						</div>
+					</li>					
+					
+					<!--Сохранить изменения-->
+					<li class="menu_item gray-border">			
+						<input class="save_button" id="save_button" type="button" value="Сохранить изменения" disabled>
+					</li>
+				</ul>
+			</form>
+		</div>
+		
+		<!--Состояние модуля-->
+		<div class="col-lg-4 col-sm-12">
+			<h1>Состояние модуля:</h1>
+			<form id="light_control" onsubmit="event.preventDefault();">
+			
+			  <!--Гирлянда-->
+				<div class="row row_input_part ">
+					<span class="row_title row_input_data col-lg-4 col-sm-12">
+						<p class="row_title">Гирлянда</p>
+					</span>
+					<span class=" row_input_data col-lg-8 col-sm-12">
+						<span class="sm-center">
+							<span class="sm-center onoffswitch">
+								<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="lightonoffswitch">
+								<label class="onoffswitch-label" for="lightonoffswitch">
+									<span class="onoffswitch-inner"></span>
+								</label>
+							</span>
+						</span>
+					</span>
+				</div>			
+				
+        <!--Режим-->
+				<div class="row row_input_part">
+					<span class="row_title row_input_data col-lg-4 col-sm-12">
+						<p class="row_title">Режим</p>
+					</span>
+					<span class=" row_input_data col-lg-8 col-sm-12">
+
+						<span class="sm-center">
+						  <input class="sm-center" type="button" value="Сменить" style="font-size: 1rem;">
+						</span>
+
+					</span>
+				</div>
+
+        <!--RSSI-->
+				<div class="row row_input_part">
+					<span class="row_title row_input_data col-lg-4 col-sm-12">
+						<p class="row_title">RSSI</p>
+					</span>
+					<span class=" row_input_data col-lg-8 col-sm-12">
+						<span class="sm-center">
+							<p id="rssi" class="like_input">0</p>
+							<p class="text">Дб</p>							
+						</span>
+					</span>
+				</div>
+
+        <!--Дата-->
+				<div class="row row_input_part">
+					<span class="row_title row_input_data col-lg-4 col-sm-12">
+						<p class="row_title">Дата</p>
+					</span>
+					<span class=" row_input_data col-lg-8 col-sm-12">
+						<p class="like_input" id="date">01.01.1900</p>
+					</span>
+				</div>
+				
+				<!--Время-->
+				<div class="row row_input_part">
+					<span class="row_title row_input_data col-lg-4 col-sm-12">
+						<p class="row_title">Время</p>
+					</span>
+					<span class=" row_input_data col-lg-8 col-sm-12">
+						<p class="like_input" id="time">00:00:00</p>
+					</span>
+				</div>
+
+        <!--Uptime-->
+				<div class="row row_input_part">
+					<span class="row_title row_input_data col-lg-4 col-sm-12">
+						<p class="row_title">Uptime</p>
+					</span>
+					<span class=" row_input_data col-lg-8 col-sm-12">
+						<p class="like_input" id="uptime">00:00:00</p>
+					</span>
+				</div>
+				
+				<!--Free RAM-->
+				<div class="row row_input_part">
+					<span class="row_title row_input_data col-lg-4 col-sm-12">
+						<p class="row_title">Free RAM</p>
+					</span>
+					<span class=" row_input_data col-lg-8 col-sm-12">
+						<p class="like_input" id="freeheap">00:00:00</p>
+					</span>
+				</div>				
+				
+			</form>
+		</div>
+	</div>
+	
+	<div id="footer">
+	</div>
+</body>
+</html>

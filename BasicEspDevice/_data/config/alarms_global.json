@@ -1,0 +1,18 @@
+{
+	"alarms_global": {
+		"sunrisebegin": 7,
+		"solstice": 5,
+		"sunrisestartbrightness": 5,
+		"sunriseendbrightness": 200,
+		"sunrisestartcolor": {
+			"r": 170,
+			"g": 85, 
+			"b": 0
+		},
+		"sunriseendcolor": {
+			"r": 255,
+			"g": 210, 
+			"b": 70
+		}		
+	}
+}

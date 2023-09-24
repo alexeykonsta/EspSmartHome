@@ -1,0 +1,8 @@
+{
+	"wifi_sta": {
+		"name": "AnJ",
+		"password": "123454321",
+		"tries": 15,
+		"hostname": "AlexLamp"
+	}
+}
