@@ -7,6 +7,7 @@ configData.ntp = new Object();
 configData.ftp = new Object();
 configData.light = new Object();
 */
+
 function fillWiFiSTA(data) {
 	configData.wifi_sta = data;
 	$('#WiFiName').val(data.name);
@@ -26,6 +27,43 @@ function fillNTP(data) {
   $('input[name="ntpoffset"][value='+data.timezonefrom+']').prop('checked', true);
   $('#ntpoffset').val(data.offset);
 }
+
+function fillRSSI(data) {
+  if (data !=$('#rssi').text()) {
+	   $('#rssi').text(data);
+	   if       ((data) < -107)  $('#rssi').css("color", "rgb(225, 120, 120)");
+	   else if  ((data) < -93)   $('#rssi').css("color", "rgb(225, 140, 0)");
+	   else if  ((data) < -85)   $('#rssi').css("color", "rgb(225, 225, 120)");
+	   else if  ((data) < -75)   $('#rssi').css("color", "rgb(180, 225, 180)");
+	   else if  ((data) >= -75)  $('#rssi').css("color", "rgb(120, 225, 120)");  
+  }
+}
+
+function fillDate(data) {
+  $('#date').text(data);
+  
+}
+
+function fillTime(data) {
+  $('#time').text(data);
+}
+
+function fillUptime(data) {
+  $('#uptime').text(data);
+}
+
+function fillFreeHeap(data) {
+  if (data != $('#freeheap').text()) $('#freeheap').text(data);
+}
+
+
+
+
+
+
+
+
+
 /*function fillFTP(data) {
 	configData.ftp = data;	
 	$('#FTPonoffswitch').prop("checked", data.start);

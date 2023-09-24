@@ -1,16 +1,12 @@
-
-
-
-
-var ws = new WebSocket('ws://'+location.hostname+'/'/*, ['arduino']*/);
-var wsLogger = new WebSocket('ws://'+location.hostname+'/logger')
-
 var ws = new WebSocket('ws://'+location.hostname+location.pathname);
 var webSocketPause = 0;
 var webSocketOpened = false;
 const webSocketPauseLimit = 4;
 var webSocketTimer = setInterval (increasePause, 1000);
-var log_output = 0;
+
+var log_output = 1;
+var log_status = 1;
+var log_ping = 0;
 
 function sleep (ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -54,8 +50,41 @@ function pingHost () {
 
 function wsMessageType (strData) {
 	let data = JSON.parse(strData);
+	//console.log(data);
 
-  console.log(data)
+
+  //log or not
+	if (typeof data.ping != "undefined" && log_ping != 0) console.log(data);
+	if ((  typeof data.wifi_sta != "undefined"
+	    || typeof data.wifi_ap  != "undefined"
+	    || typeof data.ntp      != "undefined")
+	    && log_output != 0) console.log(data);
+	if ((  typeof data.rssi     != "undefined"
+	    || typeof data.date     != "undefined"
+	    || typeof data.time     != "undefined"
+	    || typeof data.uptime   != "undefined"
+	    || typeof data.freeheap != "undefined")
+	    && log_status != 0) console.log(data);
+	    
+	
+	
+	if (typeof data.logger != "undefined") {
+	  for (i in data.logger) {
+	    //$("#content").append($( "<p class='logger' >"+data.logger[i]+"</p>" ));
+	  }
+	}
+	
+	if (typeof data.wifi_sta  != "undefined")        fillWiFiSTA(data.wifi_sta);
+	if (typeof data.wifi_ap   != "undefined")        fillWiFiAP(data.wifi_ap);
+	if (typeof data.ntp       != "undefined")        fillNTP(data.ntp);
+	
+	if (typeof data.rssi      != "undefined")        fillRSSI(data.rssi);
+	if (typeof data.date      != "undefined")        fillDate(data.date);
+	if (typeof data.time      != "undefined")        fillTime(data.time);
+	if (typeof data.uptime    != "undefined")        fillUptime(data.uptime);
+	if (typeof data.freeheap  != "undefined")        fillFreeHeap(data.freeheap);
+	
+	
 	/*
 	if (typeof data.ping === "undefined" && typeof data.device_status === "undefined") console.log(data);
 	if (typeof data.device_status != "undefined" && log_output == 1) console.log(data);
@@ -120,35 +149,9 @@ function wsMessageType (strData) {
 	};
 	*/
 
-	if (typeof data.wifi_sta != "undefined")        fillWiFiSTA(data.wifi_sta);
-	if (typeof data.wifi_ap != "undefined")         fillWiFiAP(data.wifi_ap);
-	if (typeof data.ntp != "undefined")             fillNTP(data.ntp);
+
 	
-	if (typeof data.rssi != "undefined" && data.rssi !=$('#rssi').text()) {
-	   $('#rssi').text(data.rssi);
-	   if       ((data.rssi) < -107)  $('#rssi').css("color", "rgb(225, 120, 120)");
-	   else if  ((data.rssi) < -93)   $('#rssi').css("color", "rgb(225, 140, 0)");
-	   else if  ((data.rssi) < -85)   $('#rssi').css("color", "rgb(225, 225, 120)");
-	   else if  ((data.rssi) < -75)   $('#rssi').css("color", "rgb(180, 225, 180)");
-	   else if  ((data.rssi) >= -75)  $('#rssi').css("color", "rgb(120, 225, 120)");
-	};
-	if (typeof data.date != "undefined" && data.date.replaceAll("/", ".") !=$('#date').text())       $('#date').text(data.date.replaceAll("/", "."));
-	if (typeof data.time != "undefined")                                                             $('#time').text(data.time);
-	if (typeof data.uptime != "undefined")                                                           $('#uptime').text(data.uptime);
-	if (typeof data.freeheap != "undefined" && data.freeheap != $('#freeheap').text())               $('#freeheap').text(data.freeheap);
-	
-	
-	
-	//if (typeof data. != "undefined") {};
-	/*{
-    "rssi": -65,
-    "date": "01/07/2023",
-    "time": "17:42:56",
-    "ntplastsync": 1688204107,
-    "jsdatetime": "07/01/2023 17:42:56",
-    "uptime": "   0 days 05:08:39",
-    "freeheap": 25096
-}*/
+
 	
 }
 
