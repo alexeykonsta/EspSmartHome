@@ -11,9 +11,9 @@
 
 #include "LittleFsEditor.h"
 
-#define CONFIG_WIFI_STA "/config/wifi_sta.json"
-#define CONFIG_WIFI_AP "/config/wifi_ap.json"
-#define CONFIG_NTP "/config/ntp.json"
+#define CONFIG_WIFI_STA     "/config/wifi_sta.json"
+#define CONFIG_WIFI_AP      "/config/wifi_ap.json"
+#define CONFIG_NTP          "/config/ntp.json"
 
 
 

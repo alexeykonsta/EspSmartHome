@@ -18,7 +18,7 @@ $( document ).ready(function() {
 	});
 
 	$("#save_button").on( "click", function () {
-		saveNewConfigData();
+		//saveNewConfigData();
 	});
 	
 	$("#reload_button").on( "click", function () {
@@ -29,7 +29,6 @@ $( document ).ready(function() {
 		showPassword(this);	
 	});
 	
-	/*
 	$("#ManualUpdate").on( "change", function () {
 		if ($("#ManualUpdate").val() == "") 
 			$("#update_by_file_button").prop("disabled", true);
@@ -40,6 +39,8 @@ $( document ).ready(function() {
 		updateByFile($('#ManualUpdate').prop('files')[0]);
 	});		
 	
+	
+	/*
 	$("#autoOnOffAfterManualOnFlag").on( "change", function () {
 		enableAutoOnOffAfterManualOn();
 	});
@@ -296,7 +297,7 @@ function updateByFile (file) {
 								} 	
 		});			
 		$.ajax({
-			url: './update',
+			url: './fwupdate',
 			type: 'POST',
 			data: data,
 			cache: false,
@@ -304,6 +305,7 @@ function updateByFile (file) {
 			contentType: false,
 			success: function( respond, textStatus, jqXHR ){
 				if( typeof respond.error === 'undefined' ){
+				  sendReloadRequest ();
 					let pingTimer = setInterval (pingHost, 2000);
 				}
 				else{
