@@ -1,9 +1,6 @@
 #include "WebServerController.h"
-extern AsyncWebServer webServer;
 
-Ticker rebootTimer;
-
-String getContentType                   (String filename) {
+String WebServerController::getContentType                   (String filename) {
     /*if (HTTP.hasArg("download")) return "application/octet-stream";
     else*/ if (filename.endsWith(".htm")) return "text/html";
     else if (filename.endsWith(".html")) return "text/html";
@@ -21,7 +18,7 @@ String getContentType                   (String filename) {
     return "text/plain";
 }
 
-String configFileToString               (const char path[]) {
+String WebServerController::configFileToString               (const char path[]) {
     File configFile = LittleFS.open(path, "r");
 	DynamicJsonDocument doc(1024);
     String jsonStr = configFile.readString();
@@ -29,7 +26,7 @@ String configFileToString               (const char path[]) {
     return jsonStr.substring(jsonStr.indexOf("{")+1, jsonStr.lastIndexOf("}")-jsonStr.indexOf("{"));
 }
 
-bool handleFileRead                     (AsyncWebServerRequest *request) {
+bool WebServerController::_handleFileRead                     (AsyncWebServerRequest *request) {
     String path = request->url();
     if (path.endsWith("/")) path += "index.html";
 
@@ -66,16 +63,16 @@ bool handleFileRead                     (AsyncWebServerRequest *request) {
 
 }
 
-void handlerPing                        (AsyncWebServerRequest *request) {
+void WebServerController::_handlerPing                        (AsyncWebServerRequest *request) {
     request->send(200, "text/plain", "Ping successfully");
 }
 
-void handleRestartESP                   (AsyncWebServerRequest *request) {
+void WebServerController::_handleRestartESP                   (AsyncWebServerRequest *request) {
 	request->send(200, "text/plain", "Start rebooting device");
-    rebootTimer.once(1,  ESP.restart);
+    _rebootTimer.once(1,  ESP.restart);
 }
 
-void handlerFullConfig                  (AsyncWebServerRequest *request) {
+void WebServerController::_handlerFullConfig                  (AsyncWebServerRequest *request) {
     request->send(200, "application/json", "{" 
                                             + configFileToString(CONFIG_WIFI_STA) + ", "
                                             + configFileToString(CONFIG_WIFI_AP) + ", "
@@ -83,21 +80,26 @@ void handlerFullConfig                  (AsyncWebServerRequest *request) {
     );
 }
 
-void handlerFirmwareUpdateRequest       (AsyncWebServerRequest *request) {
+void WebServerController::_handlerFirmwareUpdateRequest       (AsyncWebServerRequest *request) {
     request->send(200, "text/html", "<form method='POST' action='/fwupdate' enctype='multipart/form-data'><input type='file' name='update' accept='.bin'><input type='submit' value='Update'></form>");
 }
 
-void handlerFirmwareUpdateResponse      (AsyncWebServerRequest *request) {
+void WebServerController::_handlerFirmwareUpdateResponse      (AsyncWebServerRequest *request) {
     //rebootIsNeeded = !Update.hasError();
     AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", !Update.hasError()?"OK":"FAIL");
     response->addHeader("Connection", "close");
     request->send(response);
 }
 
-void handlerFirmwareUpdateFile          (AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
-        if(!index){
+void WebServerController::_handlerFirmwareUpdateFile          (AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
+        uint8_t progress = 0;
+
+        if(index == 0){
+            _prev_progress = 0;
+            _ContentLength = request->getHeader("Content-Length")->value().toInt();
+
             Serial.printf("Free space for new firmware: %dB\n", ((ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000));
-            Serial.printf("New firmware size:           %dB\n", request->getHeader("Content-Length")->value().toInt());
+            Serial.printf("New firmware size:           %dB\n", _ContentLength);
             Serial.printf("New firmware name:           %s\n", filename.c_str());
             Serial.printf("Update Start\n");
             Update.runAsync(true);
@@ -106,6 +108,11 @@ void handlerFirmwareUpdateFile          (AsyncWebServerRequest *request, String 
             }
         }
         if(!Update.hasError()){
+            progress = (index*100/_ContentLength);
+            if (progress != _prev_progress and progress % 5 == 0) {
+                _prev_progress = progress;
+                Serial.printf("Progress: %dkB/%dkB %d%%\n", index/1024, _ContentLength/1024, progress);
+            }                
             if(Update.write(data, len) != len){
                 Update.printError(Serial);
             }
@@ -119,27 +126,28 @@ void handlerFirmwareUpdateFile          (AsyncWebServerRequest *request, String 
         }
 }
 
-void handlerNotFound                    (AsyncWebServerRequest *request) {
-    if (!handleFileRead(request))
+void WebServerController::_handlerNotFound                    (AsyncWebServerRequest *request) {
+    if (!this->_handleFileRead(request))
         request->send(404, "text/plain", "404 Not Found");
 }
 
-void webServerBegin(/*AsyncWebServer webServer*/) {
+void WebServerController::begin() {
+    /* https://github.com/me-no-dev/ESPAsyncWebServer/issues/1278 */
+ 
+    _webServer->on("/ping",         HTTP_GET,   [&](AsyncWebServerRequest *request) {return _handlerPing(request);                      });
+    _webServer->on("/reboot",       HTTP_GET,   [&](AsyncWebServerRequest *request) {return _handleRestartESP(request);                 });
+    _webServer->on("/restart",      HTTP_GET,   [&](AsyncWebServerRequest *request) {return _handleRestartESP(request);                 });
+    _webServer->on("/fullconfig",   HTTP_GET,   [&](AsyncWebServerRequest *request) {return _handlerFullConfig(request);                });
+    _webServer->on("/fwupdate",     HTTP_GET,   [&](AsyncWebServerRequest *request) {return _handlerFirmwareUpdateRequest(request);     });
 
-    webServer.on("/ping", HTTP_GET, handlerPing);
-    webServer.on("/reboot", HTTP_GET, handleRestartESP);
-    webServer.on("/restart", HTTP_GET, handleRestartESP);
-    webServer.on("/fullconfig", HTTP_GET, handlerFullConfig);
-   
-    webServer.on("/fwupdate", HTTP_GET, handlerFirmwareUpdateRequest);
-    webServer.on("/fwupdate", HTTP_POST, handlerFirmwareUpdateResponse, handlerFirmwareUpdateFile);
+    //_webServer->on("/fwupdate",       HTTP_POST, _handlerFirmwareUpdateResponse, _handlerFirmwareUpdateFile); 
+    _webServer->on("/fwupdate",     HTTP_POST,
+            [&](AsyncWebServerRequest *request) {return _handlerFirmwareUpdateResponse(request);     },
+            [&](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {return _handlerFirmwareUpdateFile(request, filename, index, data, len, final);     }
+    );
+    _webServer->onNotFound([&](AsyncWebServerRequest *request){_handlerNotFound(request);});
 
+    _webServer->addHandler(new LittleFsEditor("",""));
 
-    webServer.onNotFound(handlerNotFound);
-
-    webServer.addHandler(new LittleFsEditor("",""));
-
-    webServer.begin();
+    _webServer->begin();
 }
-
-/*Сделать класс*/
