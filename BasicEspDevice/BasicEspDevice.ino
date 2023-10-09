@@ -2,7 +2,7 @@
 
 #include "WiFiController.h"
 #include "NTPController.h"
-#include "WebServer.h"
+#include "WebServerController.h"
 
 
 #include <WiFiClientSecureBearSSL.h>
@@ -10,13 +10,14 @@
 AsyncWebServer webServer(80);
 AsyncWebSocket ws("/");
 
-LogBuffer		logger;
-WiFiController	WiFiCtrl	(logger);
-NTPController	NTPCtrl		(logger);
+LogBuffer				logger;
+WiFiController			WiFiCtrl		(logger);
+NTPController			NTPCtrl			(logger);
+WebServerController		WSCtrl		 	(webServer, ws, logger);
 
 
 
-uint32_t prev_millis;
+uint32_t prev_millis1, prev_millis2;
 
 void setup() {
 	delay(2000); //time to arduino monitor ready
@@ -25,8 +26,10 @@ void setup() {
 	Serial.println();
 	Serial.println();
 	Serial.println();
+	Serial.println("v13");	
 	Serial.printf("			ESP.getFreeHeap() = %d\n", ESP.getFreeHeap());
 
+	webServer.addHandler(&logger.ws);
 
 	LittleFS.begin();
 	WiFiCtrl.begin();
@@ -42,35 +45,41 @@ void setup() {
 
 
 
-	webServer.addHandler(&logger.ws);
+	
 	ws.onEvent(wsOnEvent);
 	webServer.addHandler(&ws);
-	webServerBegin();
+	WSCtrl.begin();
 
 
 	//logger.test_addSomeRows();
 	//Serial.println("----");
 	//logger.printLogBufferToSerial();
 
-	prev_millis = millis();
+	prev_millis1 = millis();
+	prev_millis2 = millis();
 	//test();
 	//logger.test_addSomeRows();
 	//logger.printLogBufferToSerial();
+	//Update.clearError();
 }
 
 void loop() { 
 	
-	if (millis() - prev_millis > 1000) {
+	if (millis() - prev_millis1 > 1000) {
 		//Serial.println(millis()/1000);
 		//logger.getTimeStrFromSec (millis()/1000);
-		prev_millis = millis();
-		Serial.println();
-		Serial.println(NTP.getUptimeString());
-		Serial.println(NTP.getTimeDateString());
+		prev_millis1 = millis();
 		//logger.logRow(String(millis()));
 		wsStatus();
 		//Serial.println(logger.getTimeStrFromSec());
 	}
+
+	if (millis() - prev_millis2 > 60000) {
+		prev_millis2 = millis();
+		Serial.println();	
+		Serial.println(NTP.getUptimeString());
+		Serial.println(NTP.getTimeDateString());
+	}		
 }
 
 void test () {
@@ -115,9 +124,9 @@ void wsStatus() {
 void wsOnEvent (AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len) {
 		if (type == WS_EVT_CONNECT) {
 			ws.text(client->id(),	"{" 
-                                    + configFileToString(CONFIG_WIFI_STA) + ", "
-                                    + configFileToString(CONFIG_WIFI_AP) + ", "
-                                    + configFileToString(CONFIG_NTP) + "}"
+                                    + WSCtrl.configFileToString(CONFIG_WIFI_STA) + ", "
+                                    + WSCtrl.configFileToString(CONFIG_WIFI_AP) + ", "
+                                    + WSCtrl.configFileToString(CONFIG_NTP) + "}"
     		);
 		}
 }

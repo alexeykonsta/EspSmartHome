@@ -19,11 +19,8 @@
 
 class WebServerController {
     public:
-        //AsyncWebServer webServer = AsyncWebServer(80);
-
-        //WebServerController                           (LogBuffer &logger) {_logger = &logger;}
-        WebServerController                           (AsyncWebServer &webServer, LogBuffer &logger) {_webServer = &webServer; _logger = &logger; _prev_progress = 0; _ContentLength = 0;}
-        void begin                                    ();
+        WebServerController                    (AsyncWebServer &webServer, AsyncWebSocket &ws, LogBuffer &logger) {_webServer = &webServer; _ws = &ws; _logger = &logger; _prev_progress = 0; _ContentLength = 0;}
+        void begin                             ();
         String getContentType                  (String filename);
         String configFileToString              (const char path[]);
 
@@ -33,16 +30,18 @@ class WebServerController {
 
         LogBuffer*          _logger;
         AsyncWebServer*     _webServer;
-        Ticker       _rebootTimer;
+        AsyncWebSocket*     _ws;
+        Ticker              _rebootTimer;
 
-        bool _handleFileRead                    (AsyncWebServerRequest *request);
-        void _handlerPing                       (AsyncWebServerRequest *request);
-        void _handleRestartESP                  (AsyncWebServerRequest *request);
-        void _handlerFullConfig                 (AsyncWebServerRequest *request);
-        void _handlerFirmwareUpdateRequest      (AsyncWebServerRequest *request);
-        void _handlerFirmwareUpdateResponse     (AsyncWebServerRequest *request);
-        void _handlerFirmwareUpdateFile         (AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
-        void _handlerNotFound                   (AsyncWebServerRequest *request);
+        bool    _handleFileRead                    (AsyncWebServerRequest *request);
+        void    _handlerPing                       (AsyncWebServerRequest *request);
+        void    _handleRestartESP                  (AsyncWebServerRequest *request);
+        void    _handlerFullConfig                 (AsyncWebServerRequest *request);
+        String  _updaterErrorToString              (uint8_t _error);
+        void    _handlerFirmwareUpdateRequest      (AsyncWebServerRequest *request);
+        void    _handlerFirmwareUpdateResponse     (AsyncWebServerRequest *request);
+        void    _handlerFirmwareUpdateFile         (AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
+        void    _handlerNotFound                   (AsyncWebServerRequest *request);
         
 
 };

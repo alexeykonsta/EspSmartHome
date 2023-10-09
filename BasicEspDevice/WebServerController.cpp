@@ -69,6 +69,7 @@ void WebServerController::_handlerPing                        (AsyncWebServerReq
 
 void WebServerController::_handleRestartESP                   (AsyncWebServerRequest *request) {
 	request->send(200, "text/plain", "Start rebooting device");
+    _logger->logRow("   WebServer: device restart request from web ui (http)");
     _rebootTimer.once(1,  ESP.restart);
 }
 
@@ -80,12 +81,46 @@ void WebServerController::_handlerFullConfig                  (AsyncWebServerReq
     );
 }
 
+String WebServerController::_updaterErrorToString (uint8_t _error) {
+    /*Based on UpdaterClass::printError(Print &out)*/
+  if(_error == UPDATE_ERROR_OK){
+    return "No Error";
+  } else if(_error == UPDATE_ERROR_WRITE){
+    return "Flash Write Failed";
+  } else if(_error == UPDATE_ERROR_ERASE){
+    return "Flash Erase Failed";
+  } else if(_error == UPDATE_ERROR_READ){
+    return "Flash Read Failed";
+  } else if(_error == UPDATE_ERROR_SPACE){
+    return "Not Enough Space";
+  } else if(_error == UPDATE_ERROR_SIZE){
+    return "Bad Size Given";
+  } else if(_error == UPDATE_ERROR_STREAM){
+    return "Stream Read Timeout";
+  } else if(_error == UPDATE_ERROR_NO_DATA){
+    return "No data supplied";
+  } else if(_error == UPDATE_ERROR_MD5){
+   return "MD5 Failed";
+  } else if(_error == UPDATE_ERROR_SIGN){
+    return "Signature verification failed";
+  } else if(_error == UPDATE_ERROR_FLASH_CONFIG){
+    return "Flash config wrong real: " + String(ESP.getFlashChipRealSize()) + " IDE: " + String(ESP.getFlashChipSize());
+  } else if(_error == UPDATE_ERROR_NEW_FLASH_CONFIG){
+    return "New flash config wrong real: " + String(ESP.getFlashChipRealSize());
+  } else if(_error == UPDATE_ERROR_MAGIC_BYTE){
+    return "Magic byte is wrong, not 0xE9";
+  } else if (_error == UPDATE_ERROR_BOOTSTRAP){
+    return "Invalid bootstrapping state, reset ESP8266 before updating";
+  } else {
+    return "UNKNOWN";
+  }
+}
+
 void WebServerController::_handlerFirmwareUpdateRequest       (AsyncWebServerRequest *request) {
     request->send(200, "text/html", "<form method='POST' action='/fwupdate' enctype='multipart/form-data'><input type='file' name='update' accept='.bin'><input type='submit' value='Update'></form>");
 }
 
 void WebServerController::_handlerFirmwareUpdateResponse      (AsyncWebServerRequest *request) {
-    //rebootIsNeeded = !Update.hasError();
     AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", !Update.hasError()?"OK":"FAIL");
     response->addHeader("Connection", "close");
     request->send(response);
@@ -98,30 +133,41 @@ void WebServerController::_handlerFirmwareUpdateFile          (AsyncWebServerReq
             _prev_progress = 0;
             _ContentLength = request->getHeader("Content-Length")->value().toInt();
 
-            Serial.printf("Free space for new firmware: %dB\n", ((ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000));
-            Serial.printf("New firmware size:           %dB\n", _ContentLength);
-            Serial.printf("New firmware name:           %s\n", filename.c_str());
-            Serial.printf("Update Start\n");
+            _logger->logRow("       OTA FW Update:");
+            _logger->logRow("           OTA FW: Free space for new firmware: " + String((ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000) + "B");
+            _logger->logRow("           OTA FW: New firmware size: " + String(_ContentLength) + "B");
+            _logger->logRow("           OTA FW: Free space for new firmware: " + filename);
+            _ws->textAll("{\"ota_fw_progress\": 0}");
+
             Update.runAsync(true);
             if(!Update.begin((ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000)){
-                Update.printError(Serial);                
+                _logger->logRow("           OTA FW ERROR: " + _updaterErrorToString(Update.getError()));
+                _ws->textAll("{\"ota_fw_error\": \"" + _updaterErrorToString(Update.getError()) +"\"");
             }
         }
         if(!Update.hasError()){
             progress = (index*100/_ContentLength);
             if (progress != _prev_progress and progress % 5 == 0) {
                 _prev_progress = progress;
-                Serial.printf("Progress: %dkB/%dkB %d%%\n", index/1024, _ContentLength/1024, progress);
-            }                
+                _ws->textAll("{\"ota_fw_progress\": " + String(progress) + "}");
+
+                //Serial.printf("Progress: %dkB/%dkB %d%%\n", index/1024, _ContentLength/1024, progress);
+                if (progress % 20 == 0)
+                    _logger->logRow("           OTA FW: Progress: " + String(index/1024) + "kB/" + String(_ContentLength/1024) + "kB " + String(progress) + "%");
+            }
             if(Update.write(data, len) != len){
-                Update.printError(Serial);
+                _logger->logRow("           OTA FW ERROR: " + _updaterErrorToString(Update.getError()));
+                _ws->textAll("{\"ota_fw_error\": \"" + _updaterErrorToString(Update.getError()) +"\"");
             }
         }
         if(final){
             if(Update.end(true)){
-                Serial.printf("Update Success:              %dB\n", index+len);
+                _logger->logRow("           OTA FW: Progress: 100%");
+                _logger->logRow("           OTA FW: Progress: Update Success");
+                _ws->textAll("{\"ota_fw_progress\": 100}");
             } else {
-                Update.printError(Serial);
+                _logger->logRow("           OTA FW ERROR: " + _updaterErrorToString(Update.getError()));
+                _ws->textAll("{\"ota_fw_error\": \"" + _updaterErrorToString(Update.getError()) +"\"");
             }
         }
 }
