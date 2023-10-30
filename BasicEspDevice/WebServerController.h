@@ -27,6 +27,7 @@ class WebServerController {
     private:
         uint8_t      _prev_progress;
         uint32_t     _ContentLength;
+        String       _configInVariable = "";
 
         LogBuffer*          _logger;
         AsyncWebServer*     _webServer;
@@ -38,9 +39,17 @@ class WebServerController {
         void    _handleRestartESP                  (AsyncWebServerRequest *request);
         void    _handlerFullConfig                 (AsyncWebServerRequest *request);
         String  _updaterErrorToString              (uint8_t _error);
-        void    _handlerFirmwareUpdateRequest      (AsyncWebServerRequest *request);
+
+        void    _handlerFirmwareUpdateRequest      (AsyncWebServerRequest *request);       
         void    _handlerFirmwareUpdateResponse     (AsyncWebServerRequest *request);
         void    _handlerFirmwareUpdateFile         (AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
+
+        String  _backupConfigToVariable            ();
+        void    _restoreConfigFromVariable         (String variable);
+        void    _handlerFileSystemUpdateRequest    (AsyncWebServerRequest *request);
+        void    _handlerFileSystemUpdateResponse   (AsyncWebServerRequest *request);
+        void    _handlerFileSystemUpdateFile       (AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);        
+
         void    _handlerNotFound                   (AsyncWebServerRequest *request);
         
 
