@@ -169,9 +169,15 @@
 									<h6 class="long_title">Ручное обнавление:<img class="hint_img" src="img/hint.png"></h6>
 								</span>
 								<span class="row_input_parts col-lg-8 col-sm-12">
-									<span class="row_input_part col-lg-8 col-sm-12">
-										<input class="sm-center" id="ManualUpdate" name="update" type="file" accept=".bin">
+									<span class="row_input_part column col-lg-8 col-sm-12">
+									  <span>
+										  <p class="text col-2 col-lg-1">FS:</p><input id="FileSystem_Update" name="fsupdate" type="file" accept=".mklittlefs.bin">
+										</span>
+										<span>
+										  <p class="text col-2 col-lg-1">FW:</p><input id="Firmware_Update" name="fwupdate" type="file" accept=".bin">
+										</span>
 									</span>
+									
 									<span class="row_input_part col-lg-4 col-sm-12">
 										<input class="sm-center" id="update_by_file_button" type="button" value="Обновить" disabled>
 									</span>

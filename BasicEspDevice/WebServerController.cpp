@@ -18,53 +18,51 @@ String WebServerController::getContentType                   (String filename) {
     return "text/plain";
 }
 
-String WebServerController::configFileToString               (const char path[]) {
-    File configFile = LittleFS.open(path, "r");
-	DynamicJsonDocument doc(1024);
-    String jsonStr = configFile.readString();
+String WebServerController::configFileToString                (const char path[]) {
+  File configFile = LittleFS.open(path, "r");
+  DynamicJsonDocument doc(1024);
+  String jsonStr = configFile.readString();
 
-    return jsonStr.substring(jsonStr.indexOf("{")+1, jsonStr.lastIndexOf("}")-jsonStr.indexOf("{"));
+  return jsonStr.substring(jsonStr.indexOf("{")+1, jsonStr.lastIndexOf("}")-jsonStr.indexOf("{"));
 }
 
 bool WebServerController::_handleFileRead                     (AsyncWebServerRequest *request) {
-    String path = request->url();
-    if (path.endsWith("/")) path += "index.html";
+  String path = request->url();
+  if (path.endsWith("/")) path += "index.html";
 
-    if (LittleFS.exists(path)) {
-        request->send(LittleFS, path, getContentType(path));
-        return 1;
-    }
-    else if (LittleFS.exists(path+".html")) {
-        request->send(LittleFS, path+".html", getContentType(path+".html"));
-        return 1;
-    }
-    else if (LittleFS.exists(path+".htm")) {
-        request->send(LittleFS, path+".htm", getContentType(path+".htm"));
-        return 1;
-    }
-    else if (LittleFS.exists(path+".gz")) {
-        request->send(LittleFS, path+".gz", getContentType(path));
-        return 1;
-    }
+  if (LittleFS.exists(path)) {
+      request->send(LittleFS, path, getContentType(path));
+      return 1;
+  }
+  else if (LittleFS.exists(path+".html")) {
+      request->send(LittleFS, path+".html", getContentType(path+".html"));
+      return 1;
+  }
+  else if (LittleFS.exists(path+".htm")) {
+      request->send(LittleFS, path+".htm", getContentType(path+".htm"));
+      return 1;
+  }
+  else if (LittleFS.exists(path+".gz")) {
+      request->send(LittleFS, path+".gz", getContentType(path));
+      return 1;
+  }
 
-    Serial.printf("http request 404:\n  path:%s\n  contentType:%s\n\n", path.c_str(), getContentType(path).c_str());
-    return 0;   
+  Serial.printf("http request 404:\n  path:%s\n  contentType:%s\n\n", path.c_str(), getContentType(path).c_str());
+  return 0;
 
-
-        /*
-        Serial.printf("http request2:\n  path:%s\n  contentType:%s\n\n", path.c_str(), contentType.c_str());
-        if (request->hasParam("edit") || request->hasParam("download")) {
-            request->_tempFile = LittleFS.open(request->arg("download"), "r");
-            request->send(request->_tempFile, request->_tempFile.name(), String(), request->hasParam("download"));
-        } else {
-            request->send(LittleFS, path, contentType);
-        }
-        return true;*/
-
+  /*
+  Serial.printf("http request2:\n  path:%s\n  contentType:%s\n\n", path.c_str(), contentType.c_str());
+  if (request->hasParam("edit") || request->hasParam("download")) {
+      request->_tempFile = LittleFS.open(request->arg("download"), "r");
+      request->send(request->_tempFile, request->_tempFile.name(), String(), request->hasParam("download"));
+  } else {
+      request->send(LittleFS, path, contentType);
+  }
+  return true;*/
 }
 
 void WebServerController::_handlerPing                        (AsyncWebServerRequest *request) {
-    request->send(200, "text/plain", "Ping successfully");
+  request->send(200, "text/plain", "Ping successfully");
 }
 
 void WebServerController::_handleRestartESP                   (AsyncWebServerRequest *request) {
@@ -74,15 +72,15 @@ void WebServerController::_handleRestartESP                   (AsyncWebServerReq
 }
 
 void WebServerController::_handlerFullConfig                  (AsyncWebServerRequest *request) {
-    request->send(200, "application/json", "{" 
-                                            + configFileToString(CONFIG_WIFI_STA) + ", "
-                                            + configFileToString(CONFIG_WIFI_AP) + ", "
-                                            + configFileToString(CONFIG_NTP) + "}"
-    );
+  request->send(200, "application/json", "{" 
+                                          + configFileToString(CONFIG_WIFI_STA) + ", "
+                                          + configFileToString(CONFIG_WIFI_AP) + ", "
+                                          + configFileToString(CONFIG_NTP) + "}"
+  );
 }
 
-String WebServerController::_updaterErrorToString (uint8_t _error) {
-    /*Based on UpdaterClass::printError(Print &out)*/
+String WebServerController::_updaterErrorToString             (uint8_t _error) {
+  /*Based on UpdaterClass::printError(Print &out)*/
   if(_error == UPDATE_ERROR_OK){
     return "No Error";
   } else if(_error == UPDATE_ERROR_WRITE){
@@ -117,67 +115,168 @@ String WebServerController::_updaterErrorToString (uint8_t _error) {
 }
 
 void WebServerController::_handlerFirmwareUpdateRequest       (AsyncWebServerRequest *request) {
-    request->send(200, "text/html", "<form method='POST' action='/fwupdate' enctype='multipart/form-data'><input type='file' name='update' accept='.bin'><input type='submit' value='Update'></form>");
+  request->send(200, "text/html", "<form method='POST' action='/fwupdate' enctype='multipart/form-data'><input type='file' name='update' accept='.bin'><input type='submit' value='Update'></form>");
 }
 
 void WebServerController::_handlerFirmwareUpdateResponse      (AsyncWebServerRequest *request) {
-    AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", !Update.hasError()?"OK":"FAIL");
-    response->addHeader("Connection", "close");
-    request->send(response);
+  AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", !Update.hasError()?"OK":"FAIL");
+  response->addHeader("Connection", "close");
+  request->send(response);
 }
 
 void WebServerController::_handlerFirmwareUpdateFile          (AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
-        uint8_t progress = 0;
+  uint8_t progress = 0;
 
-        if(index == 0){
-            _prev_progress = 0;
-            _ContentLength = request->getHeader("Content-Length")->value().toInt();
+  if(index == 0){
+      _prev_progress = 0;
+      _ContentLength = request->getHeader("Content-Length")->value().toInt();
 
-            _logger->logRow("       OTA FW Update:");
-            _logger->logRow("           OTA FW: Free space for new firmware: " + String((ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000) + "B");
-            _logger->logRow("           OTA FW: New firmware size: " + String(_ContentLength) + "B");
-            _logger->logRow("           OTA FW: Free space for new firmware: " + filename);
-            _ws->textAll("{\"ota_fw_progress\": 0}");
+      _logger->logRow("       OTA FW Update:");
+      _logger->logRow("           OTA FW: Free space for new firmware: " + String((ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000) + "B");
+      _logger->logRow("           OTA FW: New firmware size: " + String(_ContentLength) + "B");
+      _logger->logRow("           OTA FW: New firmware file name: " + filename);
+      _ws->textAll("{\"ota_fw_progress\": 0}");
 
-            Update.runAsync(true);
-            if(!Update.begin((ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000)){
-                _logger->logRow("           OTA FW ERROR: " + _updaterErrorToString(Update.getError()));
-                _ws->textAll("{\"ota_fw_error\": \"" + _updaterErrorToString(Update.getError()) +"\"");
-            }
-        }
-        if(!Update.hasError()){
-            progress = (index*100/_ContentLength);
-            if (progress != _prev_progress and progress % 5 == 0) {
-                _prev_progress = progress;
-                _ws->textAll("{\"ota_fw_progress\": " + String(progress) + "}");
+      Update.runAsync(true);
+      if(!Update.begin((ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000)){
+          _logger->logRow("           OTA FW ERROR: " + _updaterErrorToString(Update.getError()));
+          _ws->textAll("{\"ota_fw_error\": \"" + _updaterErrorToString(Update.getError()) +"\"");
+      }
+  }
+  if(!Update.hasError()){
+      progress = (index*100/_ContentLength);
+      if (progress != _prev_progress and progress % 5 == 0) {
+          _prev_progress = progress;
+          _ws->textAll("{\"ota_fw_progress\": " + String(progress) + "}");
 
-                //Serial.printf("Progress: %dkB/%dkB %d%%\n", index/1024, _ContentLength/1024, progress);
-                if (progress % 20 == 0)
-                    _logger->logRow("           OTA FW: Progress: " + String(index/1024) + "kB/" + String(_ContentLength/1024) + "kB " + String(progress) + "%");
-            }
-            if(Update.write(data, len) != len){
-                _logger->logRow("           OTA FW ERROR: " + _updaterErrorToString(Update.getError()));
-                _ws->textAll("{\"ota_fw_error\": \"" + _updaterErrorToString(Update.getError()) +"\"");
-            }
-        }
-        if(final){
-            if(Update.end(true)){
-                _logger->logRow("           OTA FW: Progress: 100%");
-                _logger->logRow("           OTA FW: Progress: Update Success");
-                _ws->textAll("{\"ota_fw_progress\": 100}");
-            } else {
-                _logger->logRow("           OTA FW ERROR: " + _updaterErrorToString(Update.getError()));
-                _ws->textAll("{\"ota_fw_error\": \"" + _updaterErrorToString(Update.getError()) +"\"");
-            }
-        }
+          //Serial.printf("Progress: %dkB/%dkB %d%%\n", index/1024, _ContentLength/1024, progress);
+          if (progress % 20 == 0)
+              _logger->logRow("           OTA FW: Progress: " + String(index/1024) + "kB/" + String(_ContentLength/1024) + "kB " + String(progress) + "%");
+      }
+      if(Update.write(data, len) != len){
+          _logger->logRow("           OTA FW ERROR: " + _updaterErrorToString(Update.getError()));
+          _ws->textAll("{\"ota_fw_error\": \"" + _updaterErrorToString(Update.getError()) +"\"");
+      }
+  }
+  if(final){
+      if(Update.end(true)){
+          _logger->logRow("           OTA FW: Progress: 100%");
+          _logger->logRow("           OTA FW: Progress: Update Success");
+          _ws->textAll("{\"ota_fw_progress\": 100}");
+      } else {
+          _logger->logRow("           OTA FW ERROR: " + _updaterErrorToString(Update.getError()));
+          _ws->textAll("{\"ota_fw_error\": \"" + _updaterErrorToString(Update.getError()) +"\"");
+      }
+  }
+}
+
+String WebServerController::_backupConfigToVariable           () {
+	DynamicJsonDocument doc(1024);	
+  JsonArray array = doc.to<JsonArray>();
+	Dir configFiles = LittleFS.openDir("/config");
+
+  String buffer = "";
+  uint16_t i = 0;
+  
+	while (configFiles.next()) {
+    if (configFiles.fileSize() != 0) {
+      if (i == 0) {
+        buffer = "[";
+      } else {
+        buffer = buffer + ",";
+      }
+      buffer=buffer + "{" + configFileToString(("/config/"+configFiles.fileName()).c_str()) + "}";
+      i++;
+    }
+	}
+  if (i != 0) {
+    buffer = buffer + "]";
+    return buffer;
+  }
+  return "";
+}
+
+void WebServerController::_restoreConfigFromVariable          (String variable) {
+  DynamicJsonDocument doc(1024);
+  deserializeJson(doc, variable);
+  JsonArray array = doc.as<JsonArray>();
+
+  if (array.size() == 0) return;
+  for (uint16_t i = 0; i < array.size(); i++) {
+    String jsonStr = array[i].as<String>();   
+    String filename = jsonStr.substring(jsonStr.indexOf("\"")+1, jsonStr.indexOf("\"", jsonStr.indexOf("\"")+1))+".json";
+    
+    File configFile = LittleFS.open("/config/"+filename, "w");
+    configFile.write(jsonStr.c_str());
+  }
+}
+
+void WebServerController::_handlerFileSystemUpdateRequest     (AsyncWebServerRequest *request) {
+  request->send(200, "text/html", "<form method='POST' action='/fsupdate' enctype='multipart/form-data'><input type='file' name='update' accept='.bin'><input type='submit' value='Update'></form>");
+}
+
+void WebServerController::_handlerFileSystemUpdateResponse    (AsyncWebServerRequest *request) {
+  AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", !Update.hasError()?"OK":"FAIL");
+  response->addHeader("Connection", "close");
+  request->send(response);
+}
+
+void WebServerController::_handlerFileSystemUpdateFile        (AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
+  uint8_t progress = 0;
+
+  if(index == 0){
+      _prev_progress = 0;
+      _ContentLength = request->getHeader("Content-Length")->value().toInt();
+
+      _logger->logRow("       OTA FS Update:");
+      _logger->logRow("           OTA FS: BackUp configs");
+      _configInVariable = _backupConfigToVariable();
+      _logger->logRow("           OTA FS: Space for new file system: " + String(int(((size_t) &_FS_end - (size_t) &_FS_start))) + "B");
+      _logger->logRow("           OTA FS: New file system size: " + String(_ContentLength) + "B");
+      _logger->logRow("           OTA FS: New file system file name: " + filename);
+      _ws->textAll("{\"ota_fs_progress\": 0}");
+
+      Update.runAsync(true);
+      if(!Update.begin((((size_t) &_FS_end - (size_t) &_FS_start)), U_FS)){
+          _logger->logRow("           OTA FS ERROR: " + _updaterErrorToString(Update.getError()));
+          _ws->textAll("{\"ota_fs_error\": \"" + _updaterErrorToString(Update.getError()) +"\"");
+      }
+  }
+  if(!Update.hasError()){
+      progress = (index*100/_ContentLength);
+      if (progress != _prev_progress and progress % 5 == 0) {
+          _prev_progress = progress;
+          _ws->textAll("{\"ota_fs_progress\": " + String(progress) + "}");
+
+          //Serial.printf("Progress: %dkB/%dkB %d%%\n", index/1024, _ContentLength/1024, progress);
+          if (progress % 20 == 0)
+              _logger->logRow("           OTA FS: Progress: " + String(index/1024) + "kB/" + String(_ContentLength/1024) + "kB " + String(progress) + "%");
+      }
+      if(Update.write(data, len) != len){
+          _logger->logRow("           OTA FS ERROR: " + _updaterErrorToString(Update.getError()));
+          _ws->textAll("{\"ota_fs_error\": \"" + _updaterErrorToString(Update.getError()) +"\"");
+      }
+  }
+  if(final){
+      if(Update.end(true)){
+          _logger->logRow("           OTA FS: Progress: 100%");
+          _logger->logRow("           OTA FS: Restore configs");
+          _restoreConfigFromVariable(_configInVariable);
+          _logger->logRow("           OTA FS: Progress: Update Success");
+          _ws->textAll("{\"ota_fs_progress\": 100}");
+      } else {
+          _logger->logRow("           OTA FS ERROR: " + _updaterErrorToString(Update.getError()));
+          _ws->textAll("{\"ota_fs_error\": \"" + _updaterErrorToString(Update.getError()) +"\"");
+      }
+  }
 }
 
 void WebServerController::_handlerNotFound                    (AsyncWebServerRequest *request) {
-    if (!this->_handleFileRead(request))
-        request->send(404, "text/plain", "404 Not Found");
+  if (!this->_handleFileRead(request))
+      request->send(404, "text/plain", "404 Not Found");
 }
 
-void WebServerController::begin() {
+void WebServerController::begin                               () {
     /* https://github.com/me-no-dev/ESPAsyncWebServer/issues/1278 */
  
     _webServer->on("/ping",         HTTP_GET,   [&](AsyncWebServerRequest *request) {return _handlerPing(request);                      });
@@ -185,12 +284,18 @@ void WebServerController::begin() {
     _webServer->on("/restart",      HTTP_GET,   [&](AsyncWebServerRequest *request) {return _handleRestartESP(request);                 });
     _webServer->on("/fullconfig",   HTTP_GET,   [&](AsyncWebServerRequest *request) {return _handlerFullConfig(request);                });
     _webServer->on("/fwupdate",     HTTP_GET,   [&](AsyncWebServerRequest *request) {return _handlerFirmwareUpdateRequest(request);     });
+    _webServer->on("/fsupdate",     HTTP_GET,   [&](AsyncWebServerRequest *request) {return _handlerFileSystemUpdateRequest(request);   });
 
     //_webServer->on("/fwupdate",       HTTP_POST, _handlerFirmwareUpdateResponse, _handlerFirmwareUpdateFile); 
     _webServer->on("/fwupdate",     HTTP_POST,
             [&](AsyncWebServerRequest *request) {return _handlerFirmwareUpdateResponse(request);     },
             [&](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {return _handlerFirmwareUpdateFile(request, filename, index, data, len, final);     }
     );
+    _webServer->on("/fsupdate",     HTTP_POST,
+            [&](AsyncWebServerRequest *request) {return _handlerFileSystemUpdateResponse(request);     },
+            [&](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {return _handlerFileSystemUpdateFile(request, filename, index, data, len, final);     }
+    );
+
     _webServer->onNotFound([&](AsyncWebServerRequest *request){_handlerNotFound(request);});
 
     _webServer->addHandler(new LittleFsEditor("",""));

@@ -29,14 +29,20 @@ $( document ).ready(function() {
 		showPassword(this);	
 	});
 	
-	$("#ManualUpdate").on( "change", function () {
-		if ($("#ManualUpdate").val() == "") 
-			$("#update_by_file_button").prop("disabled", true);
-		else $("#update_by_file_button").prop("disabled", false);
+	$("#Firmware_Update").on( "change", function () {
+	  if ($("#Firmware_Update").val() != "" && $("#FileSystem_Update").val() != "")
+	    $("#update_by_file_button").prop("disabled", false);
+	  else $("#update_by_file_button").prop("disabled", true);
 	});
+	
+	$("#FileSystem_Update").on( "change", function () {
+	  if ($("#Firmware_Update").val() != "" && $("#FileSystem_Update").val() != "")
+	    $("#update_by_file_button").prop("disabled", false);
+	  else $("#update_by_file_button").prop("disabled", true);
+	});	
 
 	$("#update_by_file_button").on( "click", function () {
-		updateByFile($('#ManualUpdate').prop('files')[0]);
+		updateByFile($('#Firmware_Update').prop('files')[0], $('#FileSystem_Update').prop('files')[0]);
 	});		
 	
 	
@@ -278,45 +284,86 @@ function rangeLightBrightness () {
 	$("#lightBrightness").val($("#lightBrightnessNum").val());
 }
 
-function updateByFile (file) {
-	let data = new FormData();	
-	data.append("update", file);
-	data.append("methodNmae", "fileSend");
-	if(confirm("Устройство будет перезагружено для перепрошивки.\nСтраница обновится автоматически после перепрошивки.\nПродолжить?")) {
-		let min_window_size = Math.min($(window).height(), $(window).width());
-		clearInterval(webSocketTimer);
-		$.blockUI({ message: '<img src="img/loader.gif" class="block-gif"/>' ,
-								css: { 
-										top:  ($(window).height() - min_window_size*0.4) /2 + 'px', 
-										left: ($(window).width() - min_window_size*0.4) /2 + 'px', 
-										width: min_window_size*0.4+'px',
-										height: min_window_size*0.4+'px',
-										backgroundColor: 'transparent',
-										border: '0px',
-										opacity: 0.8
-								} 	
-		});			
-		$.ajax({
-			url: './fwupdate',
-			type: 'POST',
-			data: data,
-			cache: false,
-			processData: false,
-			contentType: false,
-			success: function( respond, textStatus, jqXHR ){
-				if( typeof respond.error === 'undefined' ){
-				  sendReloadRequest ();
-					let pingTimer = setInterval (pingHost, 2000);
-				}
-				else{
-						$.unblockUI();
-						alarm('ОШИБКИ ОТВЕТА сервера: ' + respond.error );
-				}
-			},
-			error: function( jqXHR, textStatus, errorThrown ){
-				$.unblockUI();
-				alarm('ОШИБКИ AJAX запроса: ' + textStatus );
-			}
-		});
+function updateByFile (firmwarFile, filesystemFile) {
+  
+	if (filesystemFile.name.indexOf('.mklittlefs.bin') == -1) {
+	  alert("Неверное разрешение имени файла с файловой системой (FS)");
+	  return;
+	}
+	
+	if (firmwarFile.name.indexOf('.bin') == -1 || firmwarFile.name.indexOf('.mklittlefs.bin') != -1) {
+	  alert("Неверное разрешение имени файла с прошивкой (FW)");
+	  return;
+	}
+	
+	if(confirm("Будет произведено обновление файловой системы и  прошивки устройства.\nУстройство будет перезагружено для перепрошивки.\nСтраница обновится автоматически после перепрошивки.\nПродолжить?")) {
+
+  	let min_window_size = Math.min($(window).height(), $(window).width());
+  	clearInterval(webSocketTimer);
+  	$.blockUI({ message: '<img src="img/loader.gif" class="block-gif"/><label id="progress_lable" for="progress">File system:</label><progress id="progress" max="100" value="0"></progress><p id="progress_text" class="text">0%</p>' ,
+  							css: { 
+  									top:  ($(window).height() - min_window_size*0.4) /2 + 'px', 
+  									left: ($(window).width() - min_window_size*0.4) /2 + 'px', 
+  									width: min_window_size*0.4+'px',
+  									height: min_window_size*0.4+'px',
+  									backgroundColor: 'transparent',
+  									border: '0px',
+  									opacity: 0.8
+  							} 	
+  	});	  
+	
+  	let data = new FormData();	
+  	data.append("update", filesystemFile);
+  	data.append("methodName", "fileSend");  
+  
+  	$.ajax({
+  		url: './fsupdate',
+  		type: 'POST',
+  		data: data,
+  		cache: false,
+  		processData: false,
+  		contentType: false,
+  		success: function( respond, textStatus, jqXHR ){
+            if (respond != "OK") {
+              $.unblockUI();
+              alert('ОБНОВЛЕНИЕ ФАЙЛВОЙ СИСТЕМЫ ЗАВЕРШИЛОСЬ ОШИБКОЙ\nОБНОВЛЕНИЕ ПРОШЫВКИ НЕ БУДЕТ ВЫПОЛЕНЕНО');
+              return;
+            } else {
+  			    
+            	let data = new FormData();	
+            	data.append("update", firmwarFile);
+            	data.append("methodName", "fileSend");
+            	$.ajax({
+            		url: './fwupdate',
+            		type: 'POST',
+            		data: data,
+            		cache: false,
+            		processData: false,
+            		contentType: false,
+            		success: function( respond, textStatus, jqXHR ){
+                      if (respond != "OK") {
+                        alert('ОБНОВЛЕНИЕ ПРОШИВКИ ЗАВЕРШИЛОСЬ ОШИБКОЙ');
+                        return;
+                      } else {
+                        sendReloadRequest ();
+                        let pingTimer = setInterval (pingHost, 2000);
+                      }
+            		},
+            		error: function( jqXHR, textStatus, errorThrown ){
+            			$.unblockUI();
+            			alert('ОШИБКИ AJAX запроса: ' + textStatus );
+            		}
+            	});
+          	
+  			  }
+  		},
+  		error: function( jqXHR, textStatus, errorThrown ){
+  			$.unblockUI();
+  			alert('ОШИБКИ AJAX запроса: ' + textStatus );
+  		}
+  	});
+	  
+	} else {
+	  return;
 	}
 }

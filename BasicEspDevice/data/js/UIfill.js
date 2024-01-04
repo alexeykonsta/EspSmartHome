@@ -56,7 +56,27 @@ function fillFreeHeap(data) {
   if (data != $('#freeheap').text()) $('#freeheap').text(data);
 }
 
+function fillOtaFsProgress(data)	{
+  if ($('#progress_lable').text() != "File system:") $('#progress_lable').text("File system:")
+  $('#progress').val(data)
+  $('#progress_text').text(data+"%")
+}
 
+function fillOtaFsError(data)	{
+	$.unblockUI();
+	alert('ОШИБКИ ОБНОВЛЕНИЯ ФАЙЛОВОЙ СИСТЕМЫ: ' + data );
+}
+
+function fillOtaFwProgress(data)	{
+  if ($('#progress_lable').text() != "Firmware:") $('#progress_lable').text("Firmware:")
+  $('#progress').val(data)
+  $('#progress_text').text(data+"%")  
+}
+
+function fillOtaFwError(data)	{
+	$.unblockUI();
+	alert('ОШИБКИ ОБНОВЛЕНИЯ ПРОШИВКИ: ' + data );
+}
 
 
 

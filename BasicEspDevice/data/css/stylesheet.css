@@ -80,7 +80,7 @@ h1, h2, h3, h4, h5, h6, p.title, p.light-desc {
 	line-height: 1.5;
 }
 
-h1, h2, h3, h4, h5, h6, p.light-desc {
+h1, h2, h3, h4, h5, p.light-desc {
 	text-align: center;
 	margin-top: 0;
 	margin-bottom: 0.5rem;
@@ -102,7 +102,9 @@ h6 {
 	width: 100%;
 	font-size: 1.25rem;
 	padding: 5px;
+	margin: auto;
 	white-space: nowrap;
+	text-align: center;
 }
 
 .long_title {
@@ -316,13 +318,19 @@ input[type="button"].other {
 }
 
 input[type="file"] {
-	padding: 0px;
 	font-size: 0.75rem;
 	width: 20rem;
+	margin: 0.2rem;
+	padding: 0px;
+}
+
+.column {
+  flex-direction: column;
 }
 
 #update_by_file_button {
   font-size: 1rem;
+  margin: auto;
 }
 
 ::-webkit-file-upload-button {
